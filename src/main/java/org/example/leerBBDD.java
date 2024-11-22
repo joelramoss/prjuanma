@@ -1,13 +1,26 @@
 package org.example;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import org.example.DAOs.Desarolladores;
+import org.example.DAOs.Juego;
+import org.example.DAOs.daoJuego;
+import java.sql.*;
 import java.util.Scanner;
+
 
 public class leerBBDD {
     private static final Scanner sc = new Scanner(System.in);
+    private static final Connection connection;
+    private static final daoJuego juegoDAO;
+
+    static {
+        try {
+            connection = ConnectionDB.getInstance().getConnection();
+            juegoDAO = new daoJuego(connection); // Inicializa el DAO después de que la conexión esté lista
+        } catch (SQLException e) {
+            throw new RuntimeException("Error al establecer la conexión a la base de datos", e);
+        }
+    }
+
 
     public static void menu() throws InterruptedException {
         boolean salir = false;
@@ -55,14 +68,55 @@ public class leerBBDD {
             switch (opcion) {
                 case 1:
                     System.out.println("Generando un ID de juego aleatorio...");
-                    
+                    int idAleatorio = generarIDAleatorio(connection);
+                    Juego juego1 = juegoDAO.leerJuego(idAleatorio);
+                    if (idAleatorio != -1) {
+                        juego1.toString();
+                    } else {
+                        System.out.println("No se encontró ningún juego.");
+                    }
                     break;
+
                 case 2:
                     System.out.print("Ingrese el ID de juego: ");
                     int idJuego = sc.nextInt();
-                    leerJuegoPorId(idJuego); // Llamada al método para leer el juego por ID
+                    // Llamamos al metodo para leer el juego por su ID
+                    Juego juego = juegoDAO.leerJuego(idJuego);
+
+                    if (juego != null) {
+                        System.out.println("Juego encontrado: " + juego.toString());
+                    } else {
+                        System.out.println("No se encontró el juego con el ID " + idJuego);
+                    }
                     break;
-                // Agregar más casos para las otras opciones según sea necesario
+                case 3:
+                    System.out.println("Generando un ID aleatorio para un equipo...");
+
+                    // Generamos el ID aleatorio del juego
+                    int idAleatorioJuego = generarIDAleatorio(connection);
+
+                    if (idAleatorioJuego != -1) {
+                        // Llamamos al DAO para obtener el juego con ese ID aleatorio
+                        Juego juego2 = juegoDAO.leerJuego(idAleatorioJuego);
+
+                        // Verificamos si se encontró el juego
+                        if (juego2 != null) {
+                            System.out.println("Juego encontrado: " + juego2.toString());
+
+                            // Ahora que tenemos el juego, generamos el ID aleatorio para el equipo
+                            int idAleatorioEquipo = generarIDAleatorio(connection);
+
+                            // Suponiendo que tenemos una clase para los desarrolladores, la usamos
+                            Desarolladores desarrollador = new Desarolladores(idAleatorioEquipo, juego2.getId());
+
+                            System.out.println("Equipo que creó el juego: " + desarrollador.toString());
+                        } else {
+                            System.out.println("No se encontró el juego con el ID aleatorio " + idAleatorioJuego);
+                        }
+                    } else {
+                        System.out.println("No se pudo generar un ID aleatorio para un juego.");
+                    }
+                    break;
 
                 default:
                     System.out.println("Opción no válida. Regresando al menú.");
@@ -70,30 +124,25 @@ public class leerBBDD {
         } catch (SQLException e) {
             System.out.println("Error al leer el registro: " + e.getMessage());
         }
+
     }
 
-    // Método para leer un juego por ID desde la base de datos
-    private static void leerJuegoPorId(int id) throws SQLException {
-        String query = "SELECT * FROM juegos WHERE id = ?";
-        try (Connection conn = ConnectionDB.getInstance("nombreBD", 3306, "usuario", "contraseña").getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
 
-            stmt.setInt(1, id);
-            ResultSet rs = stmt.executeQuery();
 
+
+
+    public static int generarIDAleatorio(Connection connection) throws SQLException {
+        String sql = "SELECT id FROM juego ORDER BY RAND() LIMIT 1"; // Consulta para seleccionar un ID aleatorio
+        try (Statement stmt = connection.createStatement()) {
+            ResultSet rs = stmt.executeQuery(sql);
             if (rs.next()) {
-                System.out.println("Juego encontrado:");
-                System.out.println("ID: " + rs.getInt("id"));
-                System.out.println("Título: " + rs.getString("title"));
-                System.out.println("Fecha de lanzamiento: " + rs.getDate("releaseDate"));
-                System.out.println("Resumen: " + rs.getString("summary"));
-            } else {
-                System.out.println("No se encontró un juego con el ID proporcionado.");
+                return rs.getInt("id"); // Devuelve el ID del juego aleatorio
             }
         }
+        return -1; // Si no se encuentra ningún juego
     }
 
-    // Método auxiliar para leer opciones con validación
+    // Metodo auxiliar para leer opciones con validación
     private static int leerOpcion() {
         try {
             return sc.nextInt();

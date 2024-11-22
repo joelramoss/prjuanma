@@ -1,19 +1,19 @@
 package org.example.DAOs;
 
-public class Desarrolladores {
+public class juego_equipo {
 
     private int id; // Clave primaria
     private int juegoId; // ID del juego relacionado
-    private String nombre; // Nombre del desarrollador
+
 
     // Constructor vacío
-    public Desarrolladores() {}
+    public juego_equipo() {}
 
     // Constructor con parámetros
-    public Desarrolladores(int id, int juegoId, String nombre) {
+    public juego_equipo(int id, int juegoId) {
         this.id = id;
         this.juegoId = juegoId;
-        this.nombre = nombre;
+
     }
 
     // Getters y Setters
@@ -33,21 +33,12 @@ public class Desarrolladores {
         this.juegoId = juegoId;
     }
 
-    public String getNombre() {
-        return nombre;
-    }
-
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
 
     @Override
     public String toString() {
         return "Desarrolladores{" +
-                "id=" + id +
-                ", juegoId=" + juegoId +
-                ", nombre='" + nombre + '\'' +
-                '}';
+                "id =" + id +
+                ", juegoId =" + juegoId +'}';
     }
 }
 

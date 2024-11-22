@@ -6,24 +6,24 @@ import java.sql.SQLException;
 
 public class ConnectionDB {
 
-    private static ConnectionDB instance;
+    private static ConnectionDB instance; // Instancia única de ConnectionDB
     private Connection connection;
     private String url;
 
-    private ConnectionDB(String nombreBD, int puerto, String username, String password) throws SQLException {
-        this.url = "jdbc:mysql://localhost:" + puerto + "/" + nombreBD;
-        this.connection = DriverManager.getConnection(url, username, password);
+    private ConnectionDB() throws SQLException {
+        this.url = "jdbc:mysql://localhost:3306/games";
+        this.connection = DriverManager.getConnection(url, "root", "");
     }
 
     public Connection getConnection() {
         return connection;
     }
 
-    public static ConnectionDB getInstance(String nombreBD, int puerto, String username, String password) throws SQLException {
+    public static ConnectionDB getInstance() throws SQLException {
         if (instance == null) {
-            instance = new ConnectionDB(nombreBD, puerto, username, password);
+            instance = new ConnectionDB();
         } else if (instance.getConnection().isClosed()) {
-            instance = new ConnectionDB(nombreBD, puerto, username, password);
+            instance = new ConnectionDB();
         }
 
         return instance;

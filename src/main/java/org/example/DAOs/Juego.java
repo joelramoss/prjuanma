@@ -101,6 +101,8 @@ public class Juego {
         id = random.nextInt(0,0);
     }
 
+
+
     @Override
     public  String toString() { // Método toString()
         return "Juego{" +
