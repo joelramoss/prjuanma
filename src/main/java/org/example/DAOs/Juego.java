@@ -1,6 +1,7 @@
 package org.example.DAOs;
 
 import java.util.Date;
+import java.util.Random;
 
 public class Juego {
 
@@ -91,6 +92,13 @@ public class Juego {
 
     public void setWishlist(int wishlist) {
         this.wishlist = wishlist;
+    }
+
+    public void generarIDaleatorio() {
+        Random random = new Random();
+
+        //ultimo id de la base de datos
+        id = random.nextInt(0,0);
     }
 
     @Override
