@@ -8,6 +8,7 @@ public class Generos {
     // Constructor vacío
     public Generos() {}
 
+
     // Constructor con parámetros
     public Generos(int id, String generos) {
         this.id = id;

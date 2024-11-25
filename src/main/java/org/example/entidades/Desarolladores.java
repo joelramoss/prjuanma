@@ -4,6 +4,10 @@ public class Desarolladores {
     int id;
     String nombre;
 
+    // Constructor vacío
+    public Desarolladores() {}
+
+    // Constructor con parámetros
     public Desarolladores(int id, String nombre) {
         this.id = id;
         this.nombre = nombre;

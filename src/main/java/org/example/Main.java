@@ -16,12 +16,14 @@ public class Main {
             menu(); // Inicia el menú principal
         } catch (InterruptedException IE) {
             System.out.println("Se produjo un error: " + IE.getMessage());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         } finally {
             sc.close(); // Cierra el Scanner al finalizar
         }
     }
 
-    public static void menu() throws InterruptedException {
+    public static void menu() throws InterruptedException, SQLException, IOException {
         boolean salir = false;
 
         while (!salir) {
@@ -41,16 +43,16 @@ public class Main {
                     nivel0();
                     break;
                 case 2 :
-                    
+                    RegistroAñadir.menu();
                     break;
                 case 3 :
                     leerBBDD.menu();
                     break;
                 case 4 :
-                    // actualizar registros
+                    
                     break;
                 case 5 :
-                    // eliminar registros
+
                     break;
                 case 6 :
                     System.out.println("Cerrando aplicación...");

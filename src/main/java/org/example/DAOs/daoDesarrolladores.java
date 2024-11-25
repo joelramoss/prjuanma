@@ -15,7 +15,7 @@ public class daoDesarrolladores {
     }
 
     // Crear un nuevo desarrollador
-    public void crearDesarrollador(Desarolladores desarrollador) throws SQLException {
+    public static void crearDesarrollador(Desarolladores desarrollador) throws SQLException {
         String sql = "INSERT INTO desarrolladores (id, nombre) VALUES (?, ?)";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, desarrollador.getId());

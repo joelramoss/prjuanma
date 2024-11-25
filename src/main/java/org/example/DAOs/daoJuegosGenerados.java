@@ -14,6 +14,17 @@ public class daoJuegosGenerados {
     }
 
 
+    // Crear relación de juegos generados por género
+    public static void crearRelacionJuegoGenero(int juegoId, int generoId) throws SQLException {
+        String sql = "INSERT INTO juegos_generados (juego_id, generos) VALUES (?, ?)";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, juegoId);
+            stmt.setInt(2, generoId);
+            stmt.executeUpdate();
+        }
+    }
+
+
 
     // Leer una relación de juegos generados por juego ID
     public JuegosGenerados leerJuegosGenerados(int juegoId) throws SQLException {

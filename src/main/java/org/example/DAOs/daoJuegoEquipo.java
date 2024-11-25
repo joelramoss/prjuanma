@@ -15,6 +15,15 @@ public class daoJuegoEquipo {
         this.connection = connection;
     }
 
+    // Crear relación de juegos generados por desarrollador
+    public static void crearRelacionJuegoDesarrollador(int juegoId, int desarrolladorId) throws SQLException {
+        String sql = "INSERT INTO juego_equipo (juego_id, equipo) VALUES (?, ?)";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, juegoId);
+            stmt.setInt(2, desarrolladorId);
+            stmt.executeUpdate();
+        }
+    }
 
 
     // Leer una relación de juego_equipo por su ID

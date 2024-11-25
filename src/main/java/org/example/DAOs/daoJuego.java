@@ -13,7 +13,7 @@ public class daoJuego {
     }
 
     // Crear un nuevo juego
-    public void crearJuego(Juego juego) throws SQLException {
+    public static void crearJuego(Juego juego) throws SQLException {
         String sql = "INSERT INTO juego (title, release_date, summary, plays, playing, backlogs, wishlist) VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, juego.getTitle());

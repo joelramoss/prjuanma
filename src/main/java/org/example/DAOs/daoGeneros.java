@@ -12,7 +12,7 @@ public class daoGeneros {
     }
 
     // Crear un nuevo género
-    public void crearGenero(Generos genero) throws SQLException {
+    public static void crearGenero(Generos genero) throws SQLException {
         String sql = "INSERT INTO generos (id, generos) VALUES (?, ?)";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, genero.getId());
