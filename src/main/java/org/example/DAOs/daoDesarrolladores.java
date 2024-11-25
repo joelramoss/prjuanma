@@ -1,5 +1,7 @@
 package org.example.DAOs;
 
+import org.example.entidades.Desarolladores;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;

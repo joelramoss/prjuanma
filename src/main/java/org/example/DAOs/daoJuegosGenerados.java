@@ -1,5 +1,7 @@
 package org.example.DAOs;
 
+import org.example.entidades.JuegosGenerados;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,4 +46,21 @@ public class daoJuegosGenerados {
         }
         return juegosGeneradosList;
     }
+
+    public List<JuegosGenerados> obtenerJuegosPorGenero(String nombreGenero) throws SQLException {
+        List<JuegosGenerados> juegosGeneradosList = new ArrayList<>();
+        String sql = "SELECT * FROM juegos_generados WHERE generos = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, nombreGenero);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                juegosGeneradosList.add(new JuegosGenerados(
+                        rs.getInt("juego_id"),
+                        rs.getString("generos")
+                ));
+            }
+        }
+        return juegosGeneradosList;
+    }
+
 }

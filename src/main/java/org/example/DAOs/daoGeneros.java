@@ -1,7 +1,6 @@
 package org.example.DAOs;
-import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
+import org.example.entidades.Generos;
+
 import java.sql.*;
 
 public class daoGeneros {

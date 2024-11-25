@@ -2,6 +2,8 @@ package org.example.DAOs;
 
 
 
+import org.example.entidades.juego_equipo;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -47,6 +49,29 @@ public class daoJuegoEquipo {
         return juegoEquipoList;
     }
 
-
+    // Obtener todas las relaciones de juegos y equipos por el nombre del equipo
+    public List<juego_equipo> obtenerPorNombreEquipo(String nombreEquipo) throws SQLException {
+        List<juego_equipo> juegoEquipoList = new ArrayList<>();
+        String sql = "SELECT je.id, je.juego_id " +
+                "FROM juego_equipo je " +
+                "JOIN equipo e ON je.equipo_id = e.id " +
+                "WHERE e.nombre = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, nombreEquipo);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                juegoEquipoList.add(new juego_equipo(
+                        rs.getInt("id"),
+                        rs.getInt("juego_id")
+                ));
+            }
+        }
+        return juegoEquipoList;
     }
+
+
+
+
+
+}
 

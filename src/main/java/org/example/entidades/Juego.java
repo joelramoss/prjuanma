@@ -1,4 +1,4 @@
-package org.example.DAOs;
+package org.example.entidades;
 
 import java.util.Date;
 import java.util.Random;

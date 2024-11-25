@@ -1,4 +1,4 @@
-package org.example.DAOs;
+package org.example.entidades;
 
 public class Rating {
 

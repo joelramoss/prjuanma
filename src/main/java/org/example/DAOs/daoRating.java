@@ -1,4 +1,6 @@
 package org.example.DAOs;
+import org.example.entidades.Rating;
+
 import java.sql.*;
 
 public class daoRating {
