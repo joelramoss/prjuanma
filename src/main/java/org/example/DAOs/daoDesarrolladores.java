@@ -16,11 +16,17 @@ public class daoDesarrolladores {
 
     // Crear un nuevo desarrollador
     public static void crearDesarrollador(Desarolladores desarrollador) throws SQLException {
-        String sql = "INSERT INTO desarrolladores (id, nombre) VALUES (?, ?)";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setInt(1, desarrollador.getId());
-            stmt.setString(2, desarrollador.getNombre());
+        String sql = "INSERT INTO Desarolladores (nombre) VALUES (?)";
+        try (PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            stmt.setString(1, desarrollador.getNombre());
             stmt.executeUpdate();
+
+            // Obtener el ID generado
+            try (ResultSet keys = stmt.getGeneratedKeys()) {
+                if (keys.next()) {
+                    desarrollador.setId(keys.getInt(1));
+                }
+            }
         }
     }
 

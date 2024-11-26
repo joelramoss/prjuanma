@@ -13,11 +13,16 @@ public class daoGeneros {
 
     // Crear un nuevo género
     public static void crearGenero(Generos genero) throws SQLException {
-        String sql = "INSERT INTO generos (id, generos) VALUES (?, ?)";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setInt(1, genero.getId());
-            stmt.setString(2, genero.getGeneros());
+        String sql = "INSERT INTO Generos (generos) VALUES (?)";
+        try (PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            stmt.setString(1, genero.getGeneros());
             stmt.executeUpdate();
+            // Obtener el ID generado
+            try (ResultSet keys = stmt.getGeneratedKeys()) {
+                if (keys.next()) {
+                    genero.setId(keys.getInt(1));
+                }
+            }
         }
     }
 

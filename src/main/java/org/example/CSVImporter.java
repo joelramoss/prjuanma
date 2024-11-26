@@ -59,7 +59,7 @@ public class CSVImporter {
             juego.setTitle(title);
 
             // Conversión de fecha con múltiples formatos
-            juego.setReleaseDate(convertToDate(releaseDate)); // Método actualizado para manejar diferentes formatos
+            juego.setReleaseDate(convertToDate(releaseDate)); // Metodo actualizado para manejar diferentes formatos
 
             juego.setSummary(summary);
             juego.setPlays(parseIntegerWithK(plays)); // Usamos la función para convertir los valores con 'K'
@@ -92,11 +92,17 @@ public class CSVImporter {
         }
     }
 
-    // Método para convertir una cadena de fecha a java.sql.Date con múltiples formatos
+    // Metodo para convertir una cadena de fecha a java.sql.Date con múltiples formatos
+
+
+    //ARREGLAR FECHA
     public static java.sql.Date convertToDate(String dateStr) {
+        // Normaliza mayúsculas y elimina puntos
+        dateStr = dateStr.trim().replace(".", "").toLowerCase();
+
         DateTimeFormatter[] formatters = new DateTimeFormatter[]{
-                DateTimeFormatter.ofPattern("yyyy-MM-dd"),
-                DateTimeFormatter.ofPattern("MMM dd, yyyy") // Para formatos como "Feb 25, 2022"
+                DateTimeFormatter.ofPattern("MMM dd, yyyy", java.util.Locale.ENGLISH), // Feb 25, 2022
+                DateTimeFormatter.ofPattern("MMMM dd, yyyy", java.util.Locale.ENGLISH) // February 25, 2022
         };
 
         for (DateTimeFormatter formatter : formatters) {
@@ -104,7 +110,7 @@ public class CSVImporter {
                 LocalDate date = LocalDate.parse(dateStr, formatter);
                 return java.sql.Date.valueOf(date);
             } catch (Exception e) {
-                // Ignorar excepción y probar con el siguiente formato
+                // Intentamos con el siguiente formato
             }
         }
         throw new IllegalArgumentException("Formato de fecha no válido: " + dateStr);
