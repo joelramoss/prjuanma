@@ -46,7 +46,7 @@ public class Juego {
         this.title = title;
     }
 
-    public Date getReleaseDate() {
+    public java.sql.Date getReleaseDate() {
         return releaseDate;
     }
 

@@ -41,7 +41,6 @@ public class Main {
             switch (opcion) {
                 case 1 :
                     nivel0();
-
                     break;
                 case 2 :
                     RegistroAñadir.menu();

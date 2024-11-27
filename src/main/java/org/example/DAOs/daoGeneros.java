@@ -13,7 +13,7 @@ public class daoGeneros {
 
     // Crear un nuevo género
     public void crearGenero(Generos genero) throws SQLException {
-        String sql = "INSERT INTO Generos (generos) VALUES (?)";
+        String sql = "INSERT INTO Generos (Genero) VALUES (?)";
         try (PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setString(1, genero.getGeneros());
             stmt.executeUpdate();
@@ -27,7 +27,7 @@ public class daoGeneros {
 
     // Leer un género por ID
     public Generos leerGenero(int id) throws SQLException {
-        String sql = "SELECT * FROM generos WHERE id = ?";
+        String sql = "SELECT * FROM genero WHERE id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, id);
             ResultSet rs = stmt.executeQuery();
@@ -43,7 +43,7 @@ public class daoGeneros {
 
     // Actualizar un género
     public void actualizarGenero(Generos genero) throws SQLException {
-        String sql = "UPDATE generos SET generos = ? WHERE id = ?";
+        String sql = "UPDATE generos SET genero = ? WHERE id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, genero.getGeneros());
             stmt.setInt(2, genero.getId());

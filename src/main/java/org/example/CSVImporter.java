@@ -87,9 +87,11 @@ public class CSVImporter {
                 genero.setGeneros(genre);
                 generosDAO.crearGenero(genero); // Ahora usamos la instancia de daoGeneros
 
-                // Relacionamos el juego con el género
-                daoJuegosGenerados.crearRelacionJuegoGenero(juego.getId(), genero.getId());
+                // Relacionamos el juego con el genero1
+                daoJuegosGenerados juegosGeneradosDAO = new daoJuegosGenerados(connection);
+                juegosGeneradosDAO.crearRelacionJuegoGenero(juego.getId(), genero.getId());
             }
+
 
             // Procesamos los equipos
             for (String developer : teamList) {
