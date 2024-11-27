@@ -19,7 +19,7 @@ public class leerBBDD {
     static {
         try {
             connection = ConnectionDB.getInstance().getConnection();
-            juegoDAO = new daoJuego(connection); // Inicializa el DAO después de que la conexión esté lista
+            juegoDAO = new daoJuego(); // Inicializa el DAO después de que la conexión esté lista
         } catch (SQLException e) {
             throw new RuntimeException("Error al establecer la conexión a la base de datos", e);
         }
@@ -115,7 +115,7 @@ public class leerBBDD {
         sc.nextLine(); // Limpia el buffer
 
         // Llamamos al método para leer el juego por su ID
-        Juego juego = juegoDAO.leerJuego(idJuego);
+        Juego juego = juegoDAO.obtenerPorId(idJuego);
 
         if (juego != null) {
             System.out.println("Juego encontrado: " + juego.toString());

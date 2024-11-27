@@ -1,4 +1,6 @@
 package org.example.DAOs;
+
+import org.example.ConnectionDB;
 import org.example.entidades.Juego;
 
 import java.sql.*;
@@ -8,11 +10,15 @@ import java.util.List;
 public class daoJuego {
     private static Connection connection;
 
-    public daoJuego(Connection connection) {
-        this.connection = connection;
+    static {
+        try {
+            connection = ConnectionDB.getInstance().getConnection();
+        } catch (SQLException e) {
+            throw new RuntimeException("Error al inicializar la conexión a la base de datos", e);
+        }
     }
 
-    // Crear un nuevo juego
+    // Métodos que usan la conexión estática
     public static void crearJuego(Juego juego) throws SQLException {
         String sql = "INSERT INTO juego (title, release_date, summary, plays, playing, backlogs, wishlist) VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
@@ -25,28 +31,6 @@ public class daoJuego {
             stmt.setInt(7, juego.getWishlist());
             stmt.executeUpdate();
         }
-    }
-
-    // Leer un juego por ID
-    public Juego leerJuego(int id) throws SQLException {
-        String sql = "SELECT * FROM juego WHERE id = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setInt(1, id);
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                return new Juego(
-                        rs.getInt("id"),
-                        rs.getString("title"),
-                        rs.getDate("release_date"),
-                        rs.getString("summary"),
-                        rs.getInt("plays"),
-                        rs.getInt("playing"),
-                        rs.getInt("backlogs"),
-                        rs.getInt("wishlist")
-                );
-            }
-        }
-        return null;
     }
 
     // Obtener todos los juegos
@@ -71,6 +55,29 @@ public class daoJuego {
         return juegos;
     }
 
+    // Buscar un juego por su ID
+    public Juego obtenerPorId(int id) throws SQLException {
+        Juego juego = null;
+        String sql = "SELECT * FROM juego WHERE id = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, id);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                juego = new Juego(
+                        rs.getInt("id"),
+                        rs.getString("title"),
+                        rs.getDate("release_date"),
+                        rs.getString("summary"),
+                        rs.getInt("plays"),
+                        rs.getInt("playing"),
+                        rs.getInt("backlogs"),
+                        rs.getInt("wishlist")
+                );
+            }
+        }
+        return juego;  // Si no se encuentra el juego, retornará null
+    }
+
     // Actualizar un juego
     public void actualizarJuego(Juego juego) throws SQLException {
         String sql = "UPDATE juego SET title = ?, release_date = ?, summary = ?, plays = ?, playing = ?, backlogs = ?, wishlist = ? WHERE id = ?";
@@ -85,10 +92,9 @@ public class daoJuego {
             stmt.setInt(8, juego.getId());
             stmt.executeUpdate();
             System.out.println("Juego actualizado con éxito");
-        }catch (SQLException e) {
+        } catch (SQLException e) {
             System.out.println("Error al actualizar el juego: " + e.getMessage());
-
-        }catch (Exception e) {
+        } catch (Exception e) {
             System.out.println("Error al actualizar el juego: " + e.getMessage());
         }
     }
@@ -102,4 +108,3 @@ public class daoJuego {
         }
     }
 }
-

@@ -6,7 +6,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Scanner;
 
-public class RegistroAñadir { // TODO: 11/03/2023 Añadir método para importar archivo CSV
+public class RegistroAñadir {
 
     private static final Scanner sc = new Scanner(System.in);
     private static final Connection connection;
@@ -39,7 +39,7 @@ public class RegistroAñadir { // TODO: 11/03/2023 Añadir método para importar
                         break;
                     }
                     try {
-                        CSVImporter.importarCSV(filePath);
+                        CSVImporter.importarCSV(filePath, connection);
                         System.out.println("Archivo CSV importado correctamente.");
                     } catch (IOException e) {
                         System.err.println("Error al leer el archivo CSV: " + e.getMessage());
