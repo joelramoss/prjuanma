@@ -13,12 +13,13 @@ public class Juego {
     private int playing; // Número de jugadores actualmente jugando
     private int backlogs; // Juegos en espera
     private int wishlist; // Juegos en lista de deseos
+    private int timesListed; // Número de veces que se ha listado el juego
 
     // Constructor vacío
     public Juego() {}
 
     // Constructor con parámetros
-    public Juego(int id, String title, Date releaseDate, String summary, int plays, int playing, int backlogs, int wishlist) {
+    public Juego(int id, String title, Date releaseDate, String summary, int plays, int playing, int backlogs, int wishlist, int timesListed) {
         this.id = id;
         this.title = title;
         this.releaseDate = releaseDate;
@@ -27,6 +28,7 @@ public class Juego {
         this.playing = playing;
         this.backlogs = backlogs;
         this.wishlist = wishlist;
+        this.timesListed = timesListed;
     }
 
     // Getters y Setters
@@ -92,6 +94,12 @@ public class Juego {
 
     public void setWishlist(int wishlist) {
         this.wishlist = wishlist;
+    }
+    public int getTimesListed() {
+        return timesListed;
+    }
+    public void setTimesListed(int timesListed) {
+        this.timesListed = timesListed;
     }
 
     public void generarIDaleatorio() {

@@ -20,7 +20,7 @@ public class daoJuego {
 
     // Métodos que usan la conexión estática
     public static void crearJuego(Juego juego) throws SQLException {
-        String sql = "INSERT INTO juego (title, release_date, summary, plays, playing, backlogs, wishlist) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO juego (title, release_date, summary, plays, playing, backlogs, wishlist, timesListed) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setString(1, juego.getTitle());
             stmt.setDate(2, new java.sql.Date(juego.getReleaseDate().getTime()));
@@ -29,6 +29,7 @@ public class daoJuego {
             stmt.setInt(5, juego.getPlaying());
             stmt.setInt(6, juego.getBacklogs());
             stmt.setInt(7, juego.getWishlist());
+            stmt.setInt(8, juego.getTimesListed());
             stmt.executeUpdate();
 
             // Obtener el ID generado y asignarlo al objeto
@@ -61,7 +62,8 @@ public class daoJuego {
                         rs.getInt("plays"),
                         rs.getInt("playing"),
                         rs.getInt("backlogs"),
-                        rs.getInt("wishlist")
+                        rs.getInt("wishlist"),
+                        rs.getInt("times_listed")
                 ));
             }
         }
@@ -84,7 +86,8 @@ public class daoJuego {
                         rs.getInt("plays"),
                         rs.getInt("playing"),
                         rs.getInt("backlogs"),
-                        rs.getInt("wishlist")
+                        rs.getInt("wishlist"),
+                        rs.getInt("times_listed")
                 );
             }
         }

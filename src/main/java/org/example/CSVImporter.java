@@ -18,9 +18,7 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 public class CSVImporter {
 
@@ -85,12 +83,14 @@ public class CSVImporter {
             // Inserta el juego en la base de datos
             daoJuego.crearJuego(juego);
 
-            List<String> generosProcesados = new ArrayList<>();
+// Usamos un HashMap para evitar duplicados. La clave es el género, y el valor es simplemente "true" para indicar que ya fue procesado.
+            Map<String, Boolean> generosProcesadosMap = new HashMap<>();
+
             for (String genre : genresList) {
                 // Verificamos si el género ya ha sido procesado
-                if (!generosProcesados.contains(genre)) {
-                    // Si no ha sido procesado, lo agregamos a la lista
-                    generosProcesados.add(genre);
+                if (!generosProcesadosMap.containsKey(genre)) {
+                    // Si no ha sido procesado, lo agregamos al HashMap
+                    generosProcesadosMap.put(genre, true);
 
                     // Creamos y guardamos el género en la base de datos
                     Generos genero = new Generos();
@@ -101,6 +101,7 @@ public class CSVImporter {
                     juegosGeneradosDAO.crearRelacionJuegoGenero(juego.getId(), genero.getId());
                 }
             }
+
 
             // Procesamos los equipos
             for (String developer : teamList) {
