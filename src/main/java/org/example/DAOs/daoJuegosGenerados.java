@@ -19,7 +19,7 @@ public class daoJuegosGenerados {
     public void crearRelacionJuegoGenero(int juegoId, int generoId) throws SQLException {
         String sql = "INSERT INTO juegos_generos (Juego_ID, Genero_ID) VALUES (?, ?)";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setInt(1, );
+            stmt.setInt(1,juegoId );
             stmt.setInt(2, generoId);
             stmt.executeUpdate();
         }

@@ -1,13 +1,10 @@
 package org.example;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.InputMismatchException;
-import java.util.Properties;
-import java.sql.SQLException;
 import java.util.Scanner;
-import java.io.FileInputStream;
-
+import java.sql.SQLException;
+import org.example.eliminarRegistros;
 public class Main {
     private static final Scanner sc = new Scanner(System.in); // Instancia única de Scanner
 
@@ -17,7 +14,7 @@ public class Main {
         } catch (InterruptedException IE) {
             System.out.println("Se produjo un error: " + IE.getMessage());
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            System.out.println("Se produjo un error de I/O: " + e.getMessage());
         } finally {
             sc.close(); // Cierra el Scanner al finalizar
         }
@@ -39,37 +36,38 @@ public class Main {
             int opcion = leerOpcion();
 
             switch (opcion) {
-                case 1 :
+                case 1:
                     nivel0();
                     break;
-                case 2 :
+                case 2:
                     RegistroAñadir.menu();
                     break;
-                case 3 :
+                case 3:
                     leerBBDD.menu();
                     break;
-                case 4 :
-
+                case 4:
+                    System.out.println("Opción de actualizar registros aún no implementada.");
                     break;
-                case 5 :
-
+                case 5:
+                    eliminarRegistros.menu(); // Eliminar registros
                     break;
-                case 6 :
+                case 6:
                     System.out.println("Cerrando aplicación...");
                     Thread.sleep(1000); // Simula una pausa al cerrar
                     salir = true;
                     break;
-                default :
+                default:
                     System.out.println("Opción no válida. Intente de nuevo.");
                     break;
             }
         }
     }
+
     public static void nivel0() {
         try {
             ConnectionDB connection = ConnectionDB.getInstance();
             System.out.println("Conexión exitosa a la base de datos: " + connection.getConnection().getCatalog());
-        } catch (Exception e) {
+        } catch (SQLException e) {
             System.out.println("Error al conectar con la base de datos: " + e.getMessage());
         }
     }
@@ -84,4 +82,3 @@ public class Main {
         }
     }
 }
-

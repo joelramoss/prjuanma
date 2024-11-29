@@ -1,14 +1,14 @@
 package org.example.entidades;
 
-public class Desarolladores {
+public class Desarrolladores {
     int id;
     String nombre;
 
     // Constructor vacío
-    public Desarolladores() {}
+    public Desarrolladores() {}
 
     // Constructor con parámetros
-    public Desarolladores(int id, String nombre) {
+    public Desarrolladores(int id, String nombre) {
         this.id = id;
         this.nombre = nombre;
     }

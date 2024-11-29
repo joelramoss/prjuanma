@@ -2,14 +2,14 @@ package org.example;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
-import org.example.entidades.Generos;
+import org.example.entidades.*;
 import org.example.DAOs.daoGeneros;
-import org.example.entidades.Desarolladores;
 import org.example.DAOs.daoDesarrolladores;
-import org.example.entidades.Juego;
 import org.example.DAOs.daoJuego;
 import org.example.DAOs.daoJuegosGenerados;
 import org.example.DAOs.daoJuegoEquipo;
+import org.example.DAOs.daoRating;
+import org.example.DAOs.daoDetallesJuego;  // Importar el DAO de DetallesJuego
 
 import java.io.FileReader;
 import java.io.IOException;
@@ -22,17 +22,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import static org.example.CSVImporter.DateConverter.parseIntegerWithK;
-import static org.example.CSVImporter.DateConverter.parseListFromString;
-
 public class CSVImporter {
 
-    private Connection connection;
-
-    // Asumiendo que la conexión se pasa correctamente a este método
+    // La conexión se pasa al método, no es necesario tenerla como variable de instancia
     public static void importarCSV(String filePath, Connection connection) throws IOException, SQLException {
-        // Crea una instancia de daoGeneros usando la conexión proporcionada
+        // Usamos la conexión directamente al crear los DAOs
         daoGeneros generosDAO = new daoGeneros(connection);
+        daoJuego daoJuego = new daoJuego(); // Se pasa la conexión al constructor
+        daoDesarrolladores daoDesarrolladores = new daoDesarrolladores(connection);
+        daoJuegosGenerados juegosGeneradosDAO = new daoJuegosGenerados(connection);
+        daoJuegoEquipo daoJuegoEquipo = new daoJuegoEquipo(connection);
+        daoDetallesJuego detallesJuegoDAO = new daoDetallesJuego(connection); // Crear el DAO de DetallesJuego
 
         // Lee el archivo CSV
         FileReader reader = new FileReader(filePath);
@@ -44,7 +44,6 @@ public class CSVImporter {
 
         // Procesa cada registro (fila) en el CSV
         for (CSVRecord record : records) {
-            // Lee los datos de cada columna
             String id = record.get("ID");
             String title = record.get("Title");
             String releaseDate = record.get("Release Date");
@@ -70,7 +69,12 @@ public class CSVImporter {
             juego.setTitle(title);
 
             // Conversión de fecha con múltiples formatos
-            juego.setReleaseDate(DateConverter.convertToDate(releaseDate)); // Metodo actualizado para manejar diferentes formatos
+            try {
+                juego.setReleaseDate(DateConverter.convertToDate(releaseDate)); // Metodo actualizado para manejar diferentes formatos
+            } catch (IllegalArgumentException e) {
+                System.out.println("Error al convertir la fecha para el juego con ID " + id + ": " + e.getMessage());
+                continue; // Si la fecha no es válida, saltamos este registro
+            }
 
             juego.setSummary(summary);
             juego.setPlays(parseIntegerWithK(plays)); // Usamos la función para convertir los valores con 'K'
@@ -81,91 +85,111 @@ public class CSVImporter {
             // Inserta el juego en la base de datos
             daoJuego.crearJuego(juego);
 
-            // Procesamos los géneros
+            List<String> generosProcesados = new ArrayList<>();
             for (String genre : genresList) {
-                Generos genero = new Generos();
-                genero.setGeneros(genre);
-                generosDAO.crearGenero(genero); // Ahora usamos la instancia de daoGeneros
+                // Verificamos si el género ya ha sido procesado
+                if (!generosProcesados.contains(genre)) {
+                    // Si no ha sido procesado, lo agregamos a la lista
+                    generosProcesados.add(genre);
 
-                // Relacionamos el juego con el genero1
-                daoJuegosGenerados juegosGeneradosDAO = new daoJuegosGenerados(connection);
-                juegosGeneradosDAO.crearRelacionJuegoGenero(juego.getId(), genero.getId());
+                    // Creamos y guardamos el género en la base de datos
+                    Generos genero = new Generos();
+                    genero.setGeneros(genre);
+                    generosDAO.crearGenero(genero); // Ahora usamos la instancia de daoGeneros
+
+                    // Relacionamos el juego con el género
+                    juegosGeneradosDAO.crearRelacionJuegoGenero(juego.getId(), genero.getId());
+                }
             }
-
 
             // Procesamos los equipos
             for (String developer : teamList) {
-                Desarolladores desarrollador = new Desarolladores();
+                Desarrolladores desarrollador = new Desarrolladores();
                 desarrollador.setNombre(developer);
-                daoDesarrolladores.crearDesarrollador(desarrollador); // Insertamos en la base de datos
+                daoDesarrolladores.crearDesarrollador(desarrollador); // Insertamos en la base de datos, generando el ID
 
                 // Relacionamos el juego con el desarrollador
                 daoJuegoEquipo.crearRelacionJuegoDesarrollador(juego.getId(), desarrollador.getId());
             }
+
+            // Procesar el rating
+            daoRating ratingDAO = new daoRating(connection);
+            Rating ratingObj = new Rating();
+            ratingObj.setJuegoId(juego.getId()); // Relaciona el rating con el juego
+            try {
+                // Verifica si el rating es nulo o está vacío
+                if (rating == null || rating.trim().isEmpty()) {
+                    ratingObj.setRating(0.0); // Asigna un 0 si el rating es nulo o vacío
+                } else {
+                    ratingObj.setRating(Double.parseDouble(rating.trim())); // Convierte el rating a un número decimal
+                }
+
+                // Para el número de reseñas, usa parseIntegerWithK si tiene formato con "K"
+                ratingObj.setNumberOfReviews(parseIntegerWithK(numOfReviews.trim())); // Convierte el número de reseñas a entero, considerando "K"
+
+                ratingDAO.crearRating(ratingObj); // Inserta el rating en la base de datos
+            } catch (NumberFormatException e) {
+                System.out.println("Error en los datos de rating o reviews para el juego con ID " + id + ": " + e.getMessage());
+            }
+
+            // Ahora procesamos los detalles del juego (reseñas)
+            if (reviews != null && !reviews.trim().isEmpty()) {
+                // Creamos una nueva instancia de DetallesJuego
+                DetallesJuego detallesJuego = new DetallesJuego(juego.getId(), reviews);
+                detallesJuegoDAO.crearDetallesJuego(detallesJuego); // Inserta los detalles del juego
+            }
         }
     }
 
-    // Método para convertir una cadena de fecha a java.sql.Date con múltiples formatos
-    public class DateConverter {
+    // Métodos de conversión de fechas y otros
+    public static class DateConverter {
         public static java.sql.Date convertToDate(String dateStr) {
             if (dateStr == null || dateStr.trim().isEmpty()) {
                 throw new IllegalArgumentException("El string de fecha no puede ser nulo o vacío.");
             }
 
-            // Elimina puntos y recorta espacios
-            dateStr = dateStr.trim().replace(".", "");
-
-            // Capitaliza la primera letra del mes para manejar "feb", "dec", etc.
+            dateStr = dateStr.trim().replace(".", ""); // Elimina puntos y recorta espacios
             dateStr = capitalizeMonth(dateStr);
 
-            // Define patrones compatibles
             DateTimeFormatter[] formatters = new DateTimeFormatter[]{
-                    DateTimeFormatter.ofPattern("MMM dd, yyyy", Locale.ENGLISH), // Ej: Feb 25, 2022
-                    DateTimeFormatter.ofPattern("MMMM dd, yyyy", Locale.ENGLISH) // Ej: February 25, 2022
+                    DateTimeFormatter.ofPattern("MMM dd, yyyy", Locale.ENGLISH),
+                    DateTimeFormatter.ofPattern("MMMM dd, yyyy", Locale.ENGLISH)
             };
 
             for (DateTimeFormatter formatter : formatters) {
                 try {
-                    // Intenta analizar la fecha con el formato actual
                     LocalDate parsedDate = LocalDate.parse(dateStr, formatter);
                     return java.sql.Date.valueOf(parsedDate);
                 } catch (DateTimeParseException ignored) {
-                    // Continúa al siguiente formato si falla
                 }
             }
 
-            // Lanza una excepción si ningún formato funcionó
             throw new IllegalArgumentException("Formato de fecha no válido: " + dateStr);
         }
+    }
 
-        private static String capitalizeMonth(String dateStr) {
-            // Separa los componentes (mes, día, año) y capitaliza el mes
-            String[] parts = dateStr.split(" ", 3);
-            if (parts.length < 3) return dateStr; // Si no hay al menos 3 partes, retornamos el original
+    private static String capitalizeMonth(String dateStr) {
+        String[] parts = dateStr.split(" ", 3);
+        if (parts.length < 3) return dateStr;
+        parts[0] = parts[0].substring(0, 1).toUpperCase(Locale.ENGLISH) + parts[0].substring(1).toLowerCase(Locale.ENGLISH);
+        return String.join(" ", parts);
+    }
 
-            // Capitalizamos el mes y reconstruimos la cadena
-            parts[0] = parts[0].substring(0, 1).toUpperCase(Locale.ENGLISH) + parts[0].substring(1).toLowerCase(Locale.ENGLISH);
-            return String.join(" ", parts);
+    public static List<String> parseListFromString(String input) {
+        input = input.replaceAll("[\\[\\]'\"]+", "").trim();
+        String[] items = input.split(",");
+        List<String> list = new ArrayList<>();
+        for (String item : items) {
+            list.add(item.trim());
         }
+        return list;
+    }
 
-        // Método para parsear una cadena que contiene una lista en formato JSON o similar
-        public static List<String> parseListFromString(String input) {
-            input = input.replaceAll("[\\[\\]'\"]+", "").trim();  // Limpiar corchetes, comillas y espacios
-            String[] items = input.split(",");  // Separar por comas
-            List<String> list = new ArrayList<>();
-            for (String item : items) {
-                list.add(item.trim());  // Eliminar espacios adicionales y añadir a la lista
-            }
-            return list;
-        }
-
-        // Método para convertir los valores con 'K' a números enteros
-        public static int parseIntegerWithK(String value) {
-            if (value.endsWith("K")) {
-                return (int) (Double.parseDouble(value.replace("K", "").trim()) * 1000);
-            } else {
-                return Integer.parseInt(value.trim());
-            }
+    public static int parseIntegerWithK(String value) {
+        if (value.endsWith("K")) {
+            return (int) (Double.parseDouble(value.replace("K", "").trim()) * 1000);
+        } else {
+            return Integer.parseInt(value.trim());
         }
     }
 }

@@ -1,6 +1,5 @@
 package org.example.DAOs;
-
-import org.example.entidades.Desarolladores;
+import org.example.entidades.Desarrolladores;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -10,34 +9,37 @@ import java.util.List;
 public class daoDesarrolladores {
     private static Connection connection;
 
-    public daoDesarrolladores(Connection connection) {
-        this.connection = connection;
-    }
+        public daoDesarrolladores(Connection connection) {
+            this.connection = connection;
+        }
 
-    // Crear un nuevo desarrollador
-    public static void crearDesarrollador(Desarolladores desarrollador) throws SQLException {
-        String sql = "INSERT INTO Desarolladores (nombre) VALUES (?)";
-        try (PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            stmt.setString(1, desarrollador.getNombre());
-            stmt.executeUpdate();
+        public static void crearDesarrollador(Desarrolladores desarrollador) throws SQLException {
+            if (connection == null) {
+                throw new SQLException("La conexión a la base de datos no está establecida.");
+            }
 
-            // Obtener el ID generado
-            try (ResultSet keys = stmt.getGeneratedKeys()) {
-                if (keys.next()) {
-                    desarrollador.setId(keys.getInt(1));
+            String sql = "INSERT INTO desarrolladores (nombre) VALUES (?)";
+            try (PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+                stmt.setString(1, desarrollador.getNombre());
+                stmt.executeUpdate();
+
+                // Obtener el ID generado
+                try (ResultSet keys = stmt.getGeneratedKeys()) {
+                    if (keys.next()) {
+                        desarrollador.setId(keys.getInt(1));
+                    }
                 }
             }
         }
-    }
 
     // Leer un desarrollador por ID
-    public Desarolladores leerDesarrollador(int id) throws SQLException {
+    public Desarrolladores leerDesarrollador(int id) throws SQLException {
         String sql = "SELECT * FROM desarrolladores WHERE id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, id);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                return new Desarolladores(
+                return new Desarrolladores(
                         rs.getInt("id"),
                         rs.getString("nombre")
                 );
@@ -47,13 +49,13 @@ public class daoDesarrolladores {
     }
 
     // Obtener todos los desarrolladores
-    public List<Desarolladores> obtenerTodos() throws SQLException {
-        List<Desarolladores> desarrolladores = new ArrayList<>();
+    public List<Desarrolladores> obtenerTodos() throws SQLException {
+        List<Desarrolladores> desarrolladores = new ArrayList<>();
         String sql = "SELECT * FROM desarrolladores";
         try (Statement stmt = connection.createStatement()) {
             ResultSet rs = stmt.executeQuery(sql);
             while (rs.next()) {
-                desarrolladores.add(new Desarolladores(
+                desarrolladores.add(new Desarrolladores(
                         rs.getInt("id"),
                         rs.getString("nombre")
                 ));
@@ -63,7 +65,7 @@ public class daoDesarrolladores {
     }
 
     // Actualizar un desarrollador
-    public void actualizarDesarrollador(Desarolladores desarrollador) throws SQLException {
+    public void actualizarDesarrollador(Desarrolladores desarrollador) throws SQLException {
         String sql = "UPDATE desarrolladores SET nombre = ? WHERE id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, desarrollador.getNombre());

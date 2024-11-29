@@ -132,7 +132,7 @@ public class leerBBDD {
         daoJuegoEquipo juegoEquipoDAO = new daoJuegoEquipo(connection);
 
         // Llamar al método para obtener los juegos relacionados con el nombre del equipo
-        List<juego_equipo> listaJuegosEquipo = juegoEquipoDAO.obtenerPorNombreEquipo(nombreEquipo);
+        List<juego_equipo> listaJuegosEquipo = juegoEquipoDAO.obtenerPorNombreDesarrollador(nombreEquipo);
 
         // Mostrar los resultados
         if (listaJuegosEquipo.isEmpty()) {

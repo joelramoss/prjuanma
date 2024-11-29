@@ -1,7 +1,5 @@
 package org.example.DAOs;
 
-
-
 import org.example.entidades.juego_equipo;
 
 import java.sql.*;
@@ -17,14 +15,13 @@ public class daoJuegoEquipo {
 
     // Crear relación de juegos generados por desarrollador
     public static void crearRelacionJuegoDesarrollador(int juegoId, int desarrolladorId) throws SQLException {
-        String sql = "INSERT INTO juego_equipo (juego_id, equipo) VALUES (?, ?)";
+        String sql = "INSERT INTO juego_equipo (juego_id, desarrollador_id) VALUES (?, ?)";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, juegoId);
             stmt.setInt(2, desarrolladorId);
             stmt.executeUpdate();
         }
     }
-
 
     // Leer una relación de juego_equipo por su ID
     public juego_equipo leerJuegoEquipo(int id) throws SQLException {
@@ -35,7 +32,8 @@ public class daoJuegoEquipo {
             if (rs.next()) {
                 return new juego_equipo(
                         rs.getInt("id"),
-                        rs.getInt("juego_id")
+                        rs.getInt("juego_id"),
+                        rs.getInt("desarrollador_id")  // Asegúrate de incluir el desarrollador_id
                 );
             }
         }
@@ -51,36 +49,32 @@ public class daoJuegoEquipo {
             while (rs.next()) {
                 juegoEquipoList.add(new juego_equipo(
                         rs.getInt("id"),
-                        rs.getInt("juego_id")
+                        rs.getInt("juego_id"),
+                        rs.getInt("desarrollador_id")  // Asegúrate de incluir el desarrollador_id
                 ));
             }
         }
         return juegoEquipoList;
     }
 
-    // Obtener todas las relaciones de juegos y equipos por el nombre del equipo
-    public List<juego_equipo> obtenerPorNombreEquipo(String nombreEquipo) throws SQLException {
+    // Obtener todas las relaciones de juegos y equipos por el nombre del desarrollador
+    public List<juego_equipo> obtenerPorNombreDesarrollador(String nombreDesarrollador) throws SQLException {
         List<juego_equipo> juegoEquipoList = new ArrayList<>();
-        String sql = "SELECT je.id, je.juego_id " +
+        String sql = "SELECT je.id, je.juego_id, je.desarrollador_id " +
                 "FROM juego_equipo je " +
-                "JOIN equipo e ON je.equipo_id = e.id " +
-                "WHERE e.nombre = ?";
+                "JOIN desarrolladores d ON je.desarrollador_id = d.id " +
+                "WHERE d.nombre = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setString(1, nombreEquipo);
+            stmt.setString(1, nombreDesarrollador);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 juegoEquipoList.add(new juego_equipo(
                         rs.getInt("id"),
-                        rs.getInt("juego_id")
+                        rs.getInt("juego_id"),
+                        rs.getInt("desarrollador_id")
                 ));
             }
         }
         return juegoEquipoList;
     }
-
-
-
-
-
 }
-

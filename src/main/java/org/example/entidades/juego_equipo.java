@@ -4,16 +4,16 @@ public class juego_equipo {
 
     private int id; // Clave primaria
     private int juegoId; // ID del juego relacionado
-
+    private int desarrolladorId; // ID del desarrollador relacionado
 
     // Constructor vacío
     public juego_equipo() {}
 
     // Constructor con parámetros
-    public juego_equipo(int id, int juegoId) {
+    public juego_equipo(int id, int juegoId, int desarrolladorId) {
         this.id = id;
         this.juegoId = juegoId;
-
+        this.desarrolladorId = desarrolladorId;
     }
 
     // Getters y Setters
@@ -33,13 +33,20 @@ public class juego_equipo {
         this.juegoId = juegoId;
     }
 
+    public int getDesarrolladorId() {
+        return desarrolladorId;
+    }
+
+    public void setDesarrolladorId(int desarrolladorId) {
+        this.desarrolladorId = desarrolladorId;
+    }
 
     @Override
     public String toString() {
-        return "Desarrolladores{" +
-                "id =" + id +
-                ", juegoId =" + juegoId +'}';
+        return "juego_equipo{" +
+                "id=" + id +
+                ", juegoId=" + juegoId +
+                ", desarrolladorId=" + desarrolladorId +
+                '}';
     }
 }
-
-

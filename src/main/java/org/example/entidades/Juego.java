@@ -47,7 +47,7 @@ public class Juego {
     }
 
     public java.sql.Date getReleaseDate() {
-        return releaseDate;
+        return (java.sql.Date) releaseDate;
     }
 
     public void setReleaseDate(Date releaseDate) {
